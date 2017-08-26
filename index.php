@@ -2,6 +2,8 @@
 
 require_once 'vendor/autoload.php';
 
+use Cache\Cache;
+
 header('Content-Type: application/json');
 header('Access-Control-Allow-Origin: *');
 
@@ -11,12 +13,22 @@ $exchanges = [
     \Exchanges\MercadoBitcoin::class,
 ];
 
-$data = [];
+$cache = new Cache();
 
-foreach ($exchanges as $key => $exchange) {
-    $exchangeData = (new $exchange())->data();
+$json = $cache->read('json');
 
-    $data[$exchangeData->get('name')] = $exchangeData->get('markets');
+if (!$json) {
+  $data = [];
+
+  foreach ($exchanges as $key => $exchange) {
+      $exchangeData = (new $exchange())->data();
+
+      $data[$exchangeData->get('name')] = $exchangeData->get('markets');
+  }
+
+  $json = json_encode($data);
+
+  $cache->save('json', $json, '30 seconds');
 }
 
-echo json_encode($data);
+echo $json;
