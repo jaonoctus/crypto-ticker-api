@@ -18,7 +18,11 @@ class Cache
     public function get($key, $closure, $time = '30 seconds') {
         $data = $this->read($key);
 
-        if (!$data) $this->save($key, $closure(), $time);
+        if (!$data) {
+            $data = $closure();
+
+            $this->save($key, $data, $time);
+        }
 
         return $data;
     }
