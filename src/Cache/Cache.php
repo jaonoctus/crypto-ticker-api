@@ -15,6 +15,14 @@ class Cache
             : sys_get_temp_dir());
     }
 
+    public function get($key, $closure, $time = '30 seconds') {
+        $data = $this->read($key);
+
+        if (!$data) $this->save($key, $closure(), $time);
+
+        return $data;
+    }
+
     protected function setFolder($folder)
     {
         if (file_exists($folder) && is_dir($folder) && is_writable($folder)) {

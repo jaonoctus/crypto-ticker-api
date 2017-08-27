@@ -7,28 +7,42 @@ use Cache\Cache;
 header('Content-Type: application/json');
 header('Access-Control-Allow-Origin: *');
 
-$exchanges = [
-    \Exchanges\Poloniex::class,
-    \Exchanges\Foxbit::class,
-    \Exchanges\MercadoBitcoin::class,
-];
+function generateJSON()
+{
+    $exchanges = [
+        \Exchanges\Poloniex::class,
+        \Exchanges\Foxbit::class,
+        \Exchanges\MercadoBitcoin::class,
+    ];
 
-$cache = new Cache();
+    $data = [];
 
-$json = $cache->read('json');
+    foreach ($exchanges as $key => $exchange) {
+        $exchangeData = (new $exchange())->data();
 
-if (!$json) {
-  $data = [];
+        $markets = $exchangeData->get('markets');
+        $name = $exchangeData->get('name');
 
-  foreach ($exchanges as $key => $exchange) {
-      $exchangeData = (new $exchange())->data();
+        $data[] = [
+            $name => [
+                'name' => $name,
+                'markets' => [],
+            ],
+        ];
 
-      $data[$exchangeData->get('name')] = $exchangeData->get('markets');
-  }
+        foreach ($markets as $currency => $price) {
+            $data[$key][$name]['markets'][] = [
+                $currency => [
+                    'name' => $currency,
+                    'price' => $price,
+                ],
+            ];
+        }
+    }
 
-  $json = json_encode($data);
-
-  $cache->save('json', $json, '30 seconds');
+    return json_encode($data);
 }
 
-echo $json;
+echo (new Cache())->get('json', function () {
+    return generateJSON();
+});
