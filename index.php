@@ -15,29 +15,21 @@ function generateJSON()
         \Exchanges\MercadoBitcoin::class,
     ];
 
-    $data = [];
+    $data = collect();
 
-    foreach ($exchanges as $key => $exchange) {
+    foreach ($exchanges as $exchange) {
         $exchangeData = (new $exchange())->data();
 
-        $markets = $exchangeData->get('markets');
         $name = $exchangeData->get('name');
+        $marketsData = $exchangeData->get('markets');
 
-        $data[] = [
-            $name => [
-                'name' => $name,
-                'markets' => [],
-            ],
-        ];
+        $markets = collect();
 
-        foreach ($markets as $currency => $price) {
-            $data[$key][$name]['markets'][] = [
-                $currency => [
-                    'name' => $currency,
-                    'price' => $price,
-                ],
-            ];
+        foreach ($marketsData as $currency => $price) {
+            $markets->push(compact('currency', 'price'));
         }
+
+        $data->push(compact('name', 'markets'));
     }
 
     return json_encode($data);
