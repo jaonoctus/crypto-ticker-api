@@ -77,16 +77,16 @@ function updateCurrencies(sheet) {
 
 #### 3. Define a named range
 
-(https://youtu.be/mfSQK9xRcyA)
+(https://youtu.be/PgSMs0CAgV0)
 
 - Select `Currencies!A2:A1000` and save as `Currencies`
 
-- Select `Currencies!B2:B1000` and save as `Prices`
+- Select `Currencies!A2:B1000` and save as `Prices`
 
 ### Fucking use it
 
-(https://youtu.be/0hIMfiwdGuc)
+(https://youtu.be/6vmD5RxGIOk)
 
 - Add **Data validation** in the cells you want with **Criteria** `List from a range`: `Currencies`. Set **On validation data** to `Reject input`.
 
-- To get the price, in the same row, set the value to this formula: `=IF(ISBLANK(range); ""; LOOKUP(range; Currencies; Prices))`. "range" is the cell where the currency is.
+- To get the price, in the same row, set the value to this formula: `=IF(ISBLANK(range); ""; VLOOKUP(range;Prices;2;FALSE))`. "range" is the cell where the currency is.
