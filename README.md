@@ -43,6 +43,9 @@ function main () {
   const ss = SpreadsheetApp.getActiveSpreadsheet()
   const sheet = ss.getSheetByName('Currencies')
 
+  sheet.getRange(1, 1).setValue('Currency')
+  sheet.getRange(1, 2).setValue('Price')
+
   updateCurrencies(sheet)
 }
 
@@ -51,8 +54,7 @@ function updateCurrencies(sheet) {
   const res = UrlFetchApp.fetch(api)
   const data = JSON.parse(res.getContentText())
 
-  sheet.clearContents()
-  sheet.appendRow(['Currency', 'Price'])
+  var row = 2
 
   for (var i = 0; i < data.length; i++) {
     var exchange = data[i]
@@ -63,7 +65,9 @@ function updateCurrencies(sheet) {
 
       var name = exchange.name + ':' + market.currency
 
-      sheet.appendRow([name, market.price])
+      sheet.getRange(row, 1).setValue(name)
+      sheet.getRange(row, 2).setValue(market.price)
+      row++
     }
   }
 }
